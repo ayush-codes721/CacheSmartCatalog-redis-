@@ -48,13 +48,16 @@ public class AuthController {
     }
 
     @GetMapping("/oauth-success")
-    ResponseEntity<ApiResponse> oAuthSuccess(@RequestParam String token) {
+    ResponseEntity<ApiResponse> oAuthSuccess(@RequestParam String token, HttpServletResponse response) {
 
+        LoginResponse loginResponse = authService.oauthSuccess(token);
+        Cookie cookie = authService.createCookie(loginResponse.getRefreshToken());
+        response.addCookie(cookie);
         ApiResponse apiResponse = ApiResponse
                 .builder()
                 .success(true)
                 .message("login success")
-                .data(authService.oauthSuccess(token))
+                .data(loginResponse)
                 .build();
 
         return ResponseEntity.ok(apiResponse);
